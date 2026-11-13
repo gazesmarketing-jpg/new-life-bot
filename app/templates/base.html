@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}New Life Training Center{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">✦</span>
+      <span class="brand-name">New Life Training Center</span>
+    </div>
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-link">Dashboard</a>
+      <a href="/registrations" class="nav-link">Registrations</a>
+      <a href="/students" class="nav-link">Students</a>
+      <a href="/programs" class="nav-link">Programs</a>
+      <a href="/finance" class="nav-link">Finance</a>
+      <a href="/reports" class="nav-link">Reports</a>
+      <a href="/staff" class="nav-link">Staff</a>
+      <a href="/health" class="nav-link">Health</a>
+    </div>
+    <div class="nav-user">
+      {% if request and request.user %}
+        <span class="user-badge">{{ request.user.full_name or request.user.username }} ({{ request.user.role }})</span>
+      {% else %}
+        <a href="/login" class="nav-link">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    &copy; New Life Training Center
+  </footer>
+</body>
+</html>

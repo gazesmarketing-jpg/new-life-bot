@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - New Life Training Center{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <p class="muted">Overview of registrations, classes, and finance at a glance.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.total_registrations }}</div>
+    <div class="stat-label">Total Registrations</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.pending_registrations }}</div>
+    <div class="stat-label">Pending Review</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.approved }}</div>
+    <div class="stat-label">Approved</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.enrolled }}</div>
+    <div class="stat-label">Enrolled</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.available_capacity }}</div>
+    <div class="stat-label">Available Capacity</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.outstanding_payments }}</div>
+    <div class="stat-label">Outstanding Payments</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Recent Registrations</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Registration Number</th>
+          <th>Student</th>
+          <th>Program</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr>
+          <td>{{ reg.registration_number }}</td>
+          <td>{{ reg.student.full_name if reg.student else '—' }}</td>
+          <td>{{ reg.program.name if reg.program else '—' }}</td>
+          <td>
+            <span class="badge badge-{{ reg.status.value }}">{{ reg.status.value | replace("_", " ") }}</span>
+          </td>
+          <td>{{ reg.submitted_at.strftime('%Y-%m-%d %H:%M') if reg.submitted_at else '—' }}</td>
+          <td class="actions-cell">
+            <a href="/registrations/{{ reg.id }}" class="btn btn-small">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Upcoming Classes</h2>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Day</th>
+          <th>Time</th>
+          <th>Location</th>
+          <th>Capacity</th>
+          <th>Enrolled</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cls in upcoming_classes %}
+        <tr>
+          <td>{{ cls.name }}</td>
+          <td>{{ cls.day_of_week }}</td>
+          <td>{{ cls.start_time }} - {{ cls.end_time }}</td>
+          <td>{{ cls.location or '—' }}</td>
+          <td>{{ cls.capacity }}</td>
+          <td>{{ cls.enrolled_students }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

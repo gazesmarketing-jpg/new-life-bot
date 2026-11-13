@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Login - New Life Training Center{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1>Staff Login</h1>
+  <p class="muted">Sign in to manage registrations, students, and reports.</p>
+
+  {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/login">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required autofocus>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+  </form>
+</div>
+{% endblock %}
