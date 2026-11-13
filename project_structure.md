@@ -68,12 +68,11 @@
     │   │   │   ├── __init__.py
     │   │   │   ├── setup.py
     │   │   │   ├── main_menu.py
-    │   │   │   ├── language.py
     │   │   │   ├── child_registration.py
     │   │   │   ├── parenting_course.py
-    │   │   │   ├── programs_info.py
     │   │   │   ├── account.py
     │   │   │   └── notifications.py
+    │   │   ├── knowledge.py         # Official center, program, fee and FAQ facts
     │   │   ├── messages.py          # Bilingual (Amharic/English) message templates
     │   │   └── utils.py             # Keyboard builders, state helpers
     │   ├── templates/

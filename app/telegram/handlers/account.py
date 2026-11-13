@@ -1,4 +1,4 @@
-"""Account settings, language change and profile maintenance."""
+"""Account settings: language switching."""
 
 from __future__ import annotations
 
@@ -7,34 +7,27 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from app.telegram import messages, utils
+from app.telegram.handlers.main_menu import show
 
 router = Router(name="account")
 
 
-async def account_callback(callback: CallbackQuery, state: FSMContext):
-    """Route account-related callbacks."""
+async def account_callback(callback: CallbackQuery, state: FSMContext) -> None:
+    """Route language-switch callbacks."""
     data = callback.data or ""
-    lang = (await state.get_data()).get("lang", "english")
+    await callback.answer()
 
-    if data == "cb_settings":
-        await callback.answer()
-        await callback.message.edit_text(
-            messages.t("menu:change_language", lang),
-            reply_markup=utils.language_change_keyboard(),
-        )
-    elif data == "cb_set_lang_english":
-        await callback.answer()
-        await state.update_data(lang="english")
-        await callback.message.edit_text(
-            messages.t("menu:register_child", "english"),
-            reply_markup=utils.main_menu_keyboard("english"),
-        )
-    elif data == "cb_set_lang_amharic":
-        await callback.answer()
-        await state.update_data(lang="amharic")
-        await callback.message.edit_text(
-            messages.t("menu:register_child", "amharic"),
-            reply_markup=utils.main_menu_keyboard("amharic"),
-        )
-    else:
-        await callback.answer("Unknown option")
+    if data == "cb_change_lang":
+        await show(callback, messages.t("lang_select"), utils.language_keyboard())
+        return
+
+    if data not in {"cb_set_lang_english", "cb_set_lang_amharic"}:
+        return
+
+    lang = "english" if data.endswith("english") else "amharic"
+    await state.update_data(lang=lang)
+    await show(
+        callback,
+        messages.t("lang_changed", lang) + "\n\n" + messages.t("menu:main", lang),
+        utils.main_menu_keyboard(lang),
+    )

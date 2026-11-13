@@ -1,4 +1,4 @@
-"""Telegram helper utilities: keyboards, state helpers, validation."""
+"""Telegram keyboard builders for the New Life bot."""
 
 from __future__ import annotations
 
@@ -10,102 +10,98 @@ from aiogram.types import (
     WebAppInfo,
 )
 
-MINI_APP_URL = "https://site-b394f5e831a841b3ae810de72fe6f653.freebuff.page/"
+from app.telegram import knowledge, messages
+
+MINI_APP_URL = knowledge.CENTER["registration_url"]
+
+
+def _btn(text: str, callback_data: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(text=text, callback_data=callback_data)
 
 
 def main_menu_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
-    """Build the main menu inline keyboard."""
-    buttons = [
+    """Main menu: registration first, then information sections."""
+    rows = [
+        [_btn(messages.b("register", lang), "cb_registration")],
         [
-            InlineKeyboardButton(
-                text="📝 Registration",
-                web_app=WebAppInfo(url=MINI_APP_URL),
-            ),
+            _btn(messages.b("programs", lang), "cb_programs"),
+            _btn(messages.b("about", lang), "cb_about"),
         ],
         [
-            InlineKeyboardButton(text="📚 Explore Programs", callback_data="cb_program_info"),
-            InlineKeyboardButton(text="ℹ️ Training Center Info", callback_data="cb_info"),
+            _btn(messages.b("fees", lang), "cb_fees"),
+            _btn(messages.b("faq", lang), "cb_faq"),
         ],
         [
-            InlineKeyboardButton(text="📋 My Registrations", callback_data="cb_my_registrations"),
-            InlineKeyboardButton(text="📞 Contact New Life", callback_data="cb_contact"),
+            _btn(messages.b("contact", lang), "cb_contact"),
+            _btn(messages.b("my_registrations", lang), "cb_my_registrations"),
         ],
+        [_btn(messages.b("language", lang), "cb_change_lang")],
     ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
-def start_keyboard(lang: str = "english") -> ReplyKeyboardMarkup:
-    """Build a reply keyboard for the first-run language selection."""
-    buttons = [
-        [KeyboardButton(text="🇬🇧 English"), KeyboardButton(text="🇪🇹 አማርኛ")],
-    ]
+def start_keyboard() -> ReplyKeyboardMarkup:
+    """First-run language selection."""
     return ReplyKeyboardMarkup(
-        keyboard=buttons,
+        keyboard=[[
+            KeyboardButton(text="English"),
+            KeyboardButton(text="አማርኛ"),
+        ]],
         resize_keyboard=True,
         one_time_keyboard=True,
     )
 
 
-def confirm_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
-    """Confirm / go back keyboard for registration summaries."""
+def language_keyboard() -> InlineKeyboardMarkup:
+    """Inline language switcher."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[
+            _btn(messages.b("english"), "cb_set_lang_english"),
+            _btn(messages.b("amharic"), "cb_set_lang_amharic"),
+        ]]
+    )
+
+
+def registration_choice_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
+    """Ask whether the registration is for a child or for an adult."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(text="✅ Confirm", callback_data="cb_confirm_registration"),
-                InlineKeyboardButton(text="⬅️ Go Back", callback_data="cb_go_back"),
-            ]
+            [_btn(messages.b("register_child", lang), "cb_register_child")],
+            [_btn(messages.b("register_parenting", lang), "cb_register_parenting")],
+            [_btn(messages.b("back", lang), "cb_main_menu")],
         ]
     )
 
 
-def registration_choice_keyboard() -> InlineKeyboardMarkup:
-    """Two registration options shown after the user taps Registration."""
+def programs_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
+    """List of the two active programs."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🧒 Register a Child", callback_data="cb_register_child"),
-                InlineKeyboardButton(text="👨‍👩‍👧 Parenting Course", callback_data="cb_register_parenting"),
-            ]
+            [_btn(knowledge.pick(knowledge.FUTURE_GENERATION["title"], lang),
+                  "cb_program_future_generation")],
+            [_btn(knowledge.pick(knowledge.PARENTING_ACADEMY["title"], lang),
+                  "cb_program_parenting_academy")],
+            [_btn(messages.b("main_menu", lang), "cb_main_menu")],
         ]
     )
 
 
-def registration_app_keyboard() -> InlineKeyboardMarkup:
-    """Single-button keyboard that opens the registration miniapp.
-
-    Used for old messages that still carry the legacy ``cb_registration``
-    callback button.
-    """
+def program_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
+    """Program detail keyboard: open the registration form or go back."""
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="📝 Open Registration",
-                    web_app=WebAppInfo(url=MINI_APP_URL),
-                )
-            ]
+            [InlineKeyboardButton(
+                text=messages.b("open_form", lang),
+                web_app=WebAppInfo(url=MINI_APP_URL),
+            )],
+            [_btn(messages.b("back", lang), "cb_programs")],
+            [_btn(messages.b("main_menu", lang), "cb_main_menu")],
         ]
     )
 
 
-def back_keyboard() -> InlineKeyboardMarkup:
-    """Simple back button."""
+def back_keyboard(lang: str = "english") -> InlineKeyboardMarkup:
+    """Back to the main menu."""
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="⬅️ Go Back", callback_data="cb_go_back")]]
+        inline_keyboard=[[_btn(messages.b("main_menu", lang), "cb_main_menu")]]
     )
-
-
-def language_change_keyboard() -> InlineKeyboardMarkup:
-    """Keyboard to switch language."""
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🇬🇧 English", callback_data="cb_set_lang_english"),
-                InlineKeyboardButton(text="🇪🇹 አማርኛ", callback_data="cb_set_lang_amharic"),
-            ]
-        ]
-    )
-
-
-# Development hint: replace with language-specific button rows when the
-# locale dictionary grows.
