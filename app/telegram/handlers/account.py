@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from app.telegram import messages, utils
-from app.telegram.handlers.main_menu import show
+from app.telegram.handlers.main_menu import current_lang, show
 
 router = Router(name="account")
 
@@ -17,8 +17,9 @@ async def account_callback(callback: CallbackQuery, state: FSMContext) -> None:
     data = callback.data or ""
     await callback.answer()
 
+    lang = await current_lang(state)
     if data == "cb_change_lang":
-        await show(callback, messages.t("lang_select"), utils.language_keyboard())
+        await show(callback, messages.t("lang_select", lang), utils.language_keyboard())
         return
 
     if data not in {"cb_set_lang_english", "cb_set_lang_amharic"}:
